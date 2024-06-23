@@ -42,7 +42,7 @@ public class UserEntity implements UserDetails {
     /**
      * The role of the user, represented as an enumeration.
      */
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
