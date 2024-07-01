@@ -11,12 +11,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserEntityDto {
 
     /**
      * The unique identifier of the user.
      */
     private Long id;
+
+    /**
+     * The name of the user.
+     */
+    private String name;
 
     /**
      * The username of the user.

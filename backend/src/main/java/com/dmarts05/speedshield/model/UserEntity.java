@@ -2,6 +2,7 @@ package com.dmarts05.speedshield.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +17,7 @@ import java.util.Set;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Data
 @Entity
 @Table(name = "users")
@@ -26,6 +28,12 @@ public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    /**
+     * The name of the user.
+     */
+    @Column(nullable = false)
+    private String name;
 
     /**
      * The username of the user.
@@ -45,6 +53,9 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RefreshTokenEntity> refreshTokens;
 
     /**
      * Returns the authorities granted to the user. Currently based on the role.

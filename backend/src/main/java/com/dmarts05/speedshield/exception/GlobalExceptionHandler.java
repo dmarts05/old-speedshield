@@ -28,8 +28,7 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity with error details and HTTP status BAD_REQUEST.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -48,7 +47,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidLoginException.class)
     public ResponseEntity<Map<String, String>> handleInvalidLoginException(InvalidLoginException ex) {
         Map<String, String> response = Map.of("message", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -61,5 +60,41 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleUsernameAlreadyTakenException(UsernameAlreadyTakenException ex) {
         Map<String, String> response = Map.of("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handles RefreshTokenNotFoundException thrown when a refresh token is not found.
+     *
+     * @param ex The exception instance.
+     * @return ResponseEntity with error message and HTTP status NOT_FOUND.
+     */
+    @ExceptionHandler(RefreshTokenNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleRefreshTokenNotFoundException(RefreshTokenNotFoundException ex) {
+        Map<String, String> response = Map.of("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles ExpiredRefreshTokenException thrown when a refresh token is expired.
+     *
+     * @param ex The exception instance.
+     * @return ResponseEntity with error message and HTTP status BAD_REQUEST.
+     */
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public ResponseEntity<Map<String, String>> handleExpiredRefreshTokenException(ExpiredRefreshTokenException ex) {
+        Map<String, String> response = Map.of("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles JwtAndRefreshTokenMismatchException thrown when a JWT and refresh token do not match.
+     *
+     * @param ex The exception instance.
+     * @return ResponseEntity with error message and HTTP status BAD_REQUEST.
+     */
+    @ExceptionHandler(JwtAndRefreshTokenMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleJwtAndRefreshTokenMismatchException(JwtAndRefreshTokenMismatchException ex) {
+        Map<String, String> response = Map.of("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

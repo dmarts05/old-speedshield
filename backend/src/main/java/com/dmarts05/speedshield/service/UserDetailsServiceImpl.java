@@ -1,7 +1,6 @@
 package com.dmarts05.speedshield.service;
 
 import com.dmarts05.speedshield.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,8 +11,7 @@ import org.springframework.stereotype.Service;
  * from UserRepository based on username.
  */
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
-
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     /**
@@ -21,8 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      *
      * @param userRepository The repository for user data access.
      */
-    @Autowired
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -35,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserEntityByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with given username not found"));
     }
 }
