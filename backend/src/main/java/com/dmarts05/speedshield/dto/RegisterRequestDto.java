@@ -1,5 +1,6 @@
 package com.dmarts05.speedshield.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,12 +13,19 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterDto {
+public class RegisterRequestDto {
+
+    /**
+     * Name for registration.
+     */
+    @NotBlank(message = "Name is mandatory")
+    private String name;
 
     /**
      * Username for registration.
      */
     @NotBlank(message = "Username is mandatory")
+    @Email(message = "Username must be an email")
     private String username;
 
     /**
