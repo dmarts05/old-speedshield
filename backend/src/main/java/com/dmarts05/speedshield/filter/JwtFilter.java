@@ -1,9 +1,9 @@
 package com.dmarts05.speedshield.filter;
 
 import com.dmarts05.speedshield.exception.JwtNotFoundException;
+import com.dmarts05.speedshield.model.UserEntity;
 import com.dmarts05.speedshield.service.JwtService;
 import com.dmarts05.speedshield.service.UserDetailsServiceImpl;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,24 +59,23 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Extract username from token
-        String username;
-        try {
-            username = jwtService.extractUsername(token);
-        } catch (ExpiredJwtException e) {
-            // Proceed to next filter if JWT is expired
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         SecurityContext securityContext = SecurityContextHolder.getContext();
         if (securityContext.getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
+
         // Load user details
+        String username = jwtService.extractUsername(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        // Validate JWT Token
+        boolean isValid = jwtService.isTokenValid(token, (UserEntity) userDetails);
+        if (!isValid) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // Create authentication token and set it in security context
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
