@@ -3,10 +3,7 @@ package com.dmarts05.speedshield.service;
 import com.dmarts05.speedshield.config.JwtProperties;
 import com.dmarts05.speedshield.exception.JwtNotFoundException;
 import com.dmarts05.speedshield.model.UserEntity;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,7 +88,16 @@ public class JwtService {
      */
     public Claims extractAllClaims(String token) {
         JwtParser jwtParser = Jwts.parser().verifyWith(getSignKey()).build();
-        return jwtParser.parseSignedClaims(token).getPayload();
+
+        // Extract the claims even if the JWT is expired
+        Claims claims;
+        try {
+            claims = jwtParser.parseSignedClaims(token).getPayload();
+        } catch (ExpiredJwtException e) {
+            claims = e.getClaims();
+        }
+
+        return claims;
     }
 
     /**
@@ -103,9 +109,10 @@ public class JwtService {
      */
     public boolean isTokenValid(String token, UserEntity userEntity) {
         try {
+            Jwts.parser().verifyWith(getSignKey()).build().parseSignedClaims(token);
             String username = extractUsername(token);
             return username.equals(userEntity.getUsername());
-        } catch (ExpiredJwtException e) {
+        } catch (JwtException e) {
             return false;
         }
     }
@@ -142,7 +149,6 @@ public class JwtService {
         Date issuedAt = new Date();
         Date expiration = new Date(System.currentTimeMillis() + jwtProperties.getExpiresIn().toMillis());
         return Jwts.builder()
-                .claims(claims)
                 .subject(username)
                 .issuer(jwtProperties.getIssuer())
                 .audience()
@@ -150,6 +156,7 @@ public class JwtService {
                 .and()
                 .issuedAt(issuedAt)
                 .expiration(expiration)
+                .claims(claims)
                 .signWith(getSignKey())
                 .compact();
     }

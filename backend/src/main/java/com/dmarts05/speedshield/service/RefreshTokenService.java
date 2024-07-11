@@ -7,7 +7,6 @@ import com.dmarts05.speedshield.exception.RefreshTokenNotFoundException;
 import com.dmarts05.speedshield.model.RefreshTokenEntity;
 import com.dmarts05.speedshield.model.UserEntity;
 import com.dmarts05.speedshield.repository.RefreshTokenRepository;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -92,12 +91,7 @@ public class RefreshTokenService {
      * @throws ExpiredRefreshTokenException        If the refresh token has expired.
      */
     public void validateRefreshToken(String token, String refreshToken) {
-        String username;
-        try {
-            username = jwtService.extractUsername(token);
-        } catch (ExpiredJwtException e) {
-            username = e.getClaims().getSubject();
-        }
+        String username = jwtService.extractUsername(token);
         UserEntity userEntity = userService.findByUsername(username);
         RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(RefreshTokenNotFoundException::new);

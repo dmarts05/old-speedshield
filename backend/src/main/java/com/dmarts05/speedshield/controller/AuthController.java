@@ -5,7 +5,10 @@ import com.dmarts05.speedshield.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller for login and registration endpoints.
@@ -59,15 +62,5 @@ public class AuthController {
     public ResponseEntity<JwtResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         JwtResponseDto jwtResponseDto = authService.refreshToken(refreshTokenRequestDto);
         return new ResponseEntity<>(jwtResponseDto, HttpStatus.CREATED);
-    }
-
-    /**
-     * Pings the server to check if it is running requiring authentication.
-     *
-     * @return ResponseEntity with the message "Pong".
-     */
-    @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return new ResponseEntity<>("Pong", HttpStatus.OK);
     }
 }

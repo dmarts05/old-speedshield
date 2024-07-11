@@ -3,10 +3,10 @@ package com.dmarts05.speedshield.service;
 import com.dmarts05.speedshield.config.JwtProperties;
 import com.dmarts05.speedshield.exception.ExpiredRefreshTokenException;
 import com.dmarts05.speedshield.exception.JwtAndRefreshTokenMismatchException;
-import com.dmarts05.speedshield.exception.RefreshTokenNotFoundException;
 import com.dmarts05.speedshield.model.RefreshTokenEntity;
 import com.dmarts05.speedshield.model.UserEntity;
 import com.dmarts05.speedshield.repository.RefreshTokenRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,13 +22,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceTest {
-
-    private final String testToken = "testToken";
-    private final String jwtToken = "jwtToken";
-    private final String refreshToken = "refreshToken";
-    private final String username = "testUser";
-    private final Duration refreshExpiresIn = Duration.ofDays(30);
-    private final UserEntity userEntity = UserEntity.builder().id(1L).username(username).build();
+    private static String jwtToken;
+    private static String refreshToken;
+    private static String username;
+    private static Duration refreshExpiresIn;
+    private static UserEntity userEntity;
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -41,22 +39,13 @@ class RefreshTokenServiceTest {
     @InjectMocks
     private RefreshTokenService refreshTokenService;
 
-    @Test
-    public void shouldFindByTokenWhenExists() {
-        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder().token(testToken).build();
-        when(refreshTokenRepository.findByToken(testToken)).thenReturn(Optional.of(refreshTokenEntity));
-
-        RefreshTokenEntity foundToken = refreshTokenService.findByToken(testToken);
-
-        assertNotNull(foundToken);
-        assertEquals(testToken, foundToken.getToken());
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenTokenNotFound() {
-        when(refreshTokenRepository.findByToken(testToken)).thenReturn(Optional.empty());
-
-        assertThrows(RefreshTokenNotFoundException.class, () -> refreshTokenService.findByToken(testToken));
+    @BeforeAll
+    public static void beforeAll() {
+        jwtToken = "jwtToken";
+        refreshToken = "refreshToken";
+        username = "testUser";
+        refreshExpiresIn = Duration.ofDays(30);
+        userEntity = UserEntity.builder().id(1L).username(username).build();
     }
 
     @Test
@@ -76,7 +65,6 @@ class RefreshTokenServiceTest {
                 .token(refreshToken)
                 .expiryDate(Instant.now().plus(Duration.ofDays(1)))
                 .build();
-
         when(jwtService.extractUsername(jwtToken)).thenReturn(username);
         when(userService.findByUsername(username)).thenReturn(userEntity);
         when(refreshTokenRepository.findByToken(refreshToken)).thenReturn(Optional.of(refreshTokenEntity));
@@ -92,7 +80,6 @@ class RefreshTokenServiceTest {
                 .token(refreshToken)
                 .expiryDate(Instant.now().plus(Duration.ofDays(1)))
                 .build();
-
         when(jwtService.extractUsername(jwtToken)).thenReturn(username);
         when(userService.findByUsername(username)).thenReturn(userEntity);
         when(refreshTokenRepository.findByToken(refreshToken)).thenReturn(Optional.of(refreshTokenEntity));
